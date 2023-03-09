@@ -4,8 +4,8 @@ const ErrorMessage = ({ error }) => {
   return <p>{error}</p>;
 };
 
+export default ErrorMessage;
+
 ErrorMessage.propTypes = {
   error: PropTypes.string.isRequired,
 };
-
-export default ErrorMessage;
