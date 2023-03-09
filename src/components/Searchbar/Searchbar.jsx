@@ -1,53 +1,45 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './searchbar.module.css';
 
-class Searchbar extends Component {
-  state = {
-    searchValue: '',
+const Searchbar = ({ onSubmit }) => {
+  const [searchValue, setSearchValue] = useState('');
+
+  const inputHandle = e => {
+    setSearchValue(e.currentTarget.value);
   };
 
-  inputHandle = e => {
-    const { name, value } = e.currentTarget;
-    this.setState({
-      [name]: value,
-    });
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    onSubmit(searchValue);
+    reset();
   };
 
-  handleSubmit = event => {
-    event.preventDefault();
-
-    this.props.onSubmit(this.state.searchValue);
-    this.reset();
+  const reset = () => {
+    setSearchValue('');
   };
 
-  reset = () => {
-    this.setState({ searchValue: '' });
-  };
+  return (
+    <header className={styles.searchbar}>
+      <form onSubmit={handleSubmit} className={styles.searchForm}>
+        <button type="submit" className={styles.searchFormButton}>
+          <span className={styles.searchFormButtonLabel}>Search</span>
+        </button>
 
-  render() {
-    return (
-      <header className={styles.searchbar}>
-        <form onSubmit={this.handleSubmit} className={styles.searchForm}>
-          <button type="submit" className={styles.searchFormButton}>
-            <span className={styles.searchFormButtonLabel}>Search</span>
-          </button>
-
-          <input
-            onChange={this.inputHandle}
-            name="searchValue"
-            value={this.state.searchValue}
-            className={styles.searchFormInput}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-          />
-        </form>
-      </header>
-    );
-  }
-}
+        <input
+          onChange={inputHandle}
+          value={searchValue}
+          className={styles.searchFormInput}
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+        />
+      </form>
+    </header>
+  );
+};
 
 export default Searchbar;
 

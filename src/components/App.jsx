@@ -1,6 +1,5 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { LineWave } from 'react-loader-spinner';
-
 import Searchbar from './Searchbar/Searchbar';
 import Button from './Button/Button';
 import ErrorMessage from './Message/ErrorMessage';
@@ -10,51 +9,50 @@ import Modal from './Modal/Modal';
 import getPost from './posts/posts';
 import '../index.css';
 
-export class App extends Component {
-  state = {
-    items: [],
-    page: 1,
-    searchRequest: '',
-    isLoader: false,
-    error: '',
-    message: false,
-    showModal: false,
-    largeImageURL: '',
-    tags: '',
-  };
+export const App = () => {
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const [searchRequest, setSearchRequest] = useState('');
+  const [isLoader, setIsLoader] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImageURL, setLargeImageURL] = useState('');
+  const [tags, setTags] = useState('');
 
-  componentDidUpdate(_, prevState) {
-    const { searchRequest, page } = this.state;
+  const perPage = 12;
 
-    if (prevState.searchRequest !== searchRequest || prevState.page !== page) {
-      this.fetchPost();
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setIsLoader(true);
+        setMessage(false);
+        const {
+          data: { hits },
+        } = await getPost(searchRequest, page, perPage);
+        if (hits.length) {
+          setItems(prevItems => [...prevItems, ...hits]);
+          if (hits.length < perPage) {
+            setIsLoader(false);
+          }
+        } else {
+          setItems([]);
+          setMessage(true);
+        }
+      } catch ({ response: { data } }) {
+        setError(
+          data || 'Error! Unable to load the image, please try again later!'
+        );
+      } finally {
+        setIsLoader(false);
+      }
+    };
+    if (searchRequest) {
+      fetchPost();
     }
-  }
+  }, [searchRequest, page]);
 
-  async fetchPost() {
-    const { searchRequest, page } = this.state;
-
-    try {
-      this.setState({ isLoader: true, message: false });
-      const {
-        data: { hits },
-      } = await getPost(searchRequest, page);
-      hits.length
-        ? this.setState(prevState => ({
-            items: [...prevState.items, ...hits],
-          }))
-        : this.setState({ items: [], message: true });
-    } catch ({ response: { data } }) {
-      this.setState({
-        error:
-          data || 'Error! Unable to load the image, please try again later!',
-      });
-    } finally {
-      this.setState({ isLoader: false });
-    }
-  }
-
-  submitHandler = searchValue => {
+  const submitHandler = searchValue => {
     if (!searchValue.trim()) {
       alert('Please enter a valid search term');
       return;
@@ -63,63 +61,50 @@ export class App extends Component {
       alert('Invalid search query');
       return;
     }
-
-    if (searchValue === this.state.searchRequest) {
+    if (searchValue === searchRequest) {
       return;
     }
-    this.setState({
-      items: [],
-      page: 1,
-      searchRequest: searchValue,
-      isLoader: false,
-    });
+    setItems([]);
+    setPage(1);
+    setSearchRequest(searchValue);
+    setIsLoader(false);
   };
 
-  loadMore = () => {
-    this.setState(({ page }) => ({
-      page: page + 1,
-    }));
+  const loadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  showModal = (largeImageURL, tags) => {
-    this.setState({
-      showModal: true,
-      largeImageURL,
-      tags,
-    });
+  const toShowModal = (largeImageURL, tags) => {
+    setShowModal(true);
+    setLargeImageURL(largeImageURL);
+    setTags(tags);
   };
 
-  closeModal = () => {
-    this.setState({
-      showModal: false,
-    });
+  const closeModal = () => {
+    setShowModal(false);
   };
 
-  render() {
-    const { items, isLoader, error, message, showModal, largeImageURL, tags } =
-      this.state;
-    return (
-      <div className="App">
-        {showModal && (
-          <Modal closeModal={this.closeModal}>
-            <img src={largeImageURL} alt={tags} />
-          </Modal>
-        )}
-        <Searchbar onSubmit={this.submitHandler} />
-        {error && <ErrorMessage error={error} />}
-        {message && <WarningMessage />}
-        {items.length > 0 && (
-          <ImageGallery items={items} showModal={this.showModal} />
-        )}
-        {isLoader && (
-          <LineWave
-            color="#8se36t"
-            ariaLabel="lineWave-loading"
-            wrapperClass="Loader"
-          />
-        )}
-        {Boolean(items.length) && <Button loadMore={this.loadMore} />}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="App">
+      {showModal && (
+        <Modal closeModal={closeModal}>
+          <img src={largeImageURL} alt={tags} />
+        </Modal>
+      )}
+      <Searchbar onSubmit={submitHandler} />
+      {error && <ErrorMessage error={error} />}
+      {message && <WarningMessage />}
+      {items.length > 0 && (
+        <ImageGallery items={items} showModal={toShowModal} />
+      )}
+      {isLoader && (
+        <LineWave
+          color="#8se36t"
+          ariaLabel="lineWave-loading"
+          wrapperClass="Loader"
+        />
+      )}
+      {Boolean(items.length) && <Button loadMore={loadMore} />}
+    </div>
+  );
+};

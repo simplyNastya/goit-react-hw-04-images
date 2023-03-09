@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import styles from './imageGalleryItem.module.css';
 
-const ImageGalleryItem = ({ imageURL, showModal, largeImageURL, tags }) => {
+const ImageGalleryItem = ({ id, imageURL, showModal, largeImageURL, tags }) => {
   return (
     <li
+      key={id}
       onClick={() => showModal(largeImageURL, tags)}
       className={styles.imageGalleryItem}
     >
