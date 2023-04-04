@@ -19,22 +19,17 @@ export const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [largeImageURL, setLargeImageURL] = useState('');
   const [tags, setTags] = useState('');
-
-  const perPage = 12;
+  const [totalHits, setTotalHits] = useState(0);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setIsLoader(true);
         setMessage(false);
-        const {
-          data: { hits },
-        } = await getPost(searchRequest, page, perPage);
-        if (hits.length) {
-          setItems(prevItems => [...prevItems, ...hits]);
-          if (hits.length < perPage) {
-            setIsLoader(false);
-          }
+        const { data } = await getPost(searchRequest, page);
+        if (data.hits.length) {
+          setItems(prevItems => [...prevItems, ...data.hits]);
+          setTotalHits(data.totalHits);
         } else {
           setItems([]);
           setMessage(true);
@@ -104,7 +99,9 @@ export const App = () => {
           wrapperClass="Loader"
         />
       )}
-      {Boolean(items.length) && <Button loadMore={loadMore} />}
+      {Boolean(items.length) && items.length !== totalHits && (
+        <Button loadMore={loadMore} />
+      )}
     </div>
   );
 };
