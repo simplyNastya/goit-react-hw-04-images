@@ -1,5 +1,9 @@
+import Notiflix from 'notiflix';
+
 const WarningMessage = () => {
-  return <p>Sorry, but nothing was found for your request!</p>;
+  return Notiflix.Notify.warning(
+    'Sorry, but nothing was found for your request!'
+  );
 };
 
 export default WarningMessage;

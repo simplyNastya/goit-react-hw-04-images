@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { FiSearch } from 'react-icons/fi';
 import styles from './searchbar.module.css';
 
 const Searchbar = ({ onSubmit }) => {
@@ -24,6 +25,7 @@ const Searchbar = ({ onSubmit }) => {
     <header className={styles.searchbar}>
       <form onSubmit={handleSubmit} className={styles.searchForm}>
         <button type="submit" className={styles.searchFormButton}>
+          <FiSearch className={styles.searchFormSvg} />
           <span className={styles.searchFormButtonLabel}>Search</span>
         </button>
 

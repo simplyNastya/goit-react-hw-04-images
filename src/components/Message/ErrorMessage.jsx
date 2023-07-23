@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
+import Notiflix from 'notiflix';
 
 const ErrorMessage = ({ error }) => {
-  return <p>{error}</p>;
+  return Notiflix.Notify.error({ error });
 };
 
 export default ErrorMessage;

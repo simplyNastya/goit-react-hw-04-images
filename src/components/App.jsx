@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { LineWave } from 'react-loader-spinner';
+import { MagnifyingGlass } from 'react-loader-spinner';
+import Notiflix from 'notiflix';
 import Searchbar from './Searchbar/Searchbar';
 import Button from './Button/Button';
 import ErrorMessage from './Message/ErrorMessage';
@@ -49,12 +50,10 @@ export const App = () => {
 
   const submitHandler = searchValue => {
     if (!searchValue.trim()) {
-      alert('Please enter a valid search term');
-      return;
+      return Notiflix.Notify.info('Please enter a valid search term');
     }
     if (!searchValue.match(/^[a-zA-Z0-9-_ ]*$/)) {
-      alert('Invalid search query');
-      return;
+      return Notiflix.Notify.info('Invalid search query');
     }
     if (searchValue === searchRequest) {
       return;
@@ -93,11 +92,18 @@ export const App = () => {
         <ImageGallery items={items} showModal={toShowModal} />
       )}
       {isLoader && (
-        <LineWave
-          color="#8se36t"
-          ariaLabel="lineWave-loading"
-          wrapperClass="Loader"
-        />
+        <div className="loader">
+          <MagnifyingGlass
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="MagnifyingGlass-loading"
+            wrapperStyle={{}}
+            wrapperClass="MagnifyingGlass-wrapper"
+            glassColor="#c0efff"
+            color="#3f51b5"
+          />
+        </div>
       )}
       {Boolean(items.length) && items.length !== totalHits && (
         <Button loadMore={loadMore} />
